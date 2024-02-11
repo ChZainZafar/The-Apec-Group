@@ -83,7 +83,7 @@ export default function AddDocumentDialog({ visible, onDismiss, folderId }) {
           }}
         />
       )}
-      <Dialog.Title>Add a Docuement</Dialog.Title>
+      <Dialog.Title>Add a Document</Dialog.Title>
       <Dialog.Content style={{ height: "90%", width: "100%" }}>
         {loading && (
           <View

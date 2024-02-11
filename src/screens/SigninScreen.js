@@ -26,6 +26,7 @@ export default function SigninScreen({ navigation, route }) {
         setUsername("");
         setLoading(false);
         navigation.navigate("SelectionScreen");
+        return;
       }
 
       try {
@@ -53,14 +54,6 @@ export default function SigninScreen({ navigation, route }) {
                   "You have signed in as admin"
                 );
                 setUser(userData);
-                setTimeout(function () {
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: "HomeScreens" }],
-                    })
-                  );
-                }, 2500);
               }
               if (userData.isApproved && userData.isApproved === true) {
                 setLoading(false);
@@ -75,14 +68,6 @@ export default function SigninScreen({ navigation, route }) {
                 setUsertype(usertype);
                 setPassword("");
                 setUsername("");
-                setTimeout(function () {
-                  navigation.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: "HomeScreens" }],
-                    })
-                  );
-                }, 2500);
               } else if (userData.isApproved == false) {
                 setLoading(false);
 
@@ -119,7 +104,13 @@ export default function SigninScreen({ navigation, route }) {
 
   return (
     <>
-      <Toast />
+      <View
+        style={{
+          zIndex: Number.MAX_SAFE_INTEGER,
+        }}
+      >
+        <Toast />
+      </View>
       <View style={{ flex: 0.33 }}>
         <Logo height={"100%"} width={"100%"} />
       </View>

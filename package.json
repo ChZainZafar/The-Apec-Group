@@ -13,7 +13,8 @@
     "@expo-google-fonts/oswald": "^0.2.3",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-navigation/drawer": "^6.6.6",
-    "@react-navigation/native-stack": "^6.9.17",
+    "@react-navigation/native": "^6.1.10",
+    "@react-navigation/native-stack": "^6.9.18",
     "expo": "^50.0.6",
     "expo-av": "^13.10.5",
     "expo-document-picker": "~11.10.1",
@@ -32,7 +33,8 @@
     "react-native-toast-message": "^2.2.0",
     "react-native-vector-icons": "^10.0.3",
     "react-native-webview": "^13.7.1",
-    "styled-components": "^6.1.8"
+    "styled-components": "^6.1.8",
+    "expo-sharing": "~11.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

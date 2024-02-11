@@ -17,7 +17,13 @@ import Toast from "react-native-toast-message";
 import { getAllDocuments } from "../config/firebase";
 import { ActivityIndicator } from "react-native-paper";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
-import { getDownloadURL, getStorage, listAll, ref } from "firebase/storage";
+import {
+  getDownloadURL,
+  getStorage,
+  listAll,
+  ref,
+  getMetadata,
+} from "firebase/storage";
 import * as FileSystem from "expo-file-system";
 import { showToast } from "../utils/commonFunctions.js";
 
@@ -87,13 +93,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const downloadFile = async (path, fileUrl) => {
+  const downloadFile = async (path, fileUrl, fileRef) => {
     try {
+      const metadata = await getMetadata(fileRef);
+      let extension = metadata.contentType.split("/");
+      if (extension.length > 0) {
+        if (extension[1] == "pdf") extension = "";
+        else if (extension[0] == "image") extension = ".jpeg";
+        else extension = `.${extension[1]}`;
+      } else throw "";
+
       const dirUri =
         FileSystem.documentDirectory + path.substring(0, path.lastIndexOf("/"));
       await ensureDirExists(dirUri); // Ensure the directory exists
 
-      const fileUri = FileSystem.documentDirectory + path;
+      const fileUri = FileSystem.documentDirectory + path + (extension || "");
       const downloadResult = await FileSystem.downloadAsync(fileUrl, fileUri);
       console.log("File downloaded to:", downloadResult.uri);
       return downloadResult.uri;
@@ -141,7 +155,7 @@ export default function HomeScreen({ navigation }) {
           let imagePathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/images/${imagesNames[imageIndex]}`;
           const fileRef = ref(storage, imagePathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(imagePath, downloadUrl);
+          downloadFile(imagePath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/images`);
@@ -157,7 +171,7 @@ export default function HomeScreen({ navigation }) {
           let videoPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
           const fileRef = ref(storage, videoPathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(videoPath, downloadUrl);
+          downloadFile(videoPath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/videos`);
@@ -173,7 +187,7 @@ export default function HomeScreen({ navigation }) {
           let documentPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
           const fileRef = ref(storage, documentPathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(documentPath, downloadUrl);
+          downloadFile(documentPath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/documents`);
@@ -186,7 +200,7 @@ export default function HomeScreen({ navigation }) {
       let iconPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/${filesInTab[0]}`;
       const fileRef = ref(storage, iconPathS);
       const downloadUrl = await getDownloadURL(fileRef);
-      downloadFile(iconPath, downloadUrl);
+      downloadFile(iconPath, downloadUrl, fileRef);
     }
     setIsSyncing(false);
     getTabsL();
@@ -224,7 +238,7 @@ export default function HomeScreen({ navigation }) {
   }, []);
   console.log("folders", folders);
   return (
-    <View style={{ flex: 1, width: "100%" }}>
+    <View style={{ flex: 1, width: "100%", paddingHorizontal: 15 }}>
       <Toast />
 
       {folders == null || isSyncing == true ? (
@@ -261,7 +275,9 @@ export default function HomeScreen({ navigation }) {
         </View>
       ) : (
         <FlatList
-          data={folders}
+          data={folders.sort(
+            (a, b) => parseInt(a.split("_")[0]) - parseInt(b.split("_")[0])
+          )}
           numColumns={Math.floor(windowWidth / 150)} // Adjust the constant value as needed
           renderItem={({ item }) => {
             return (
@@ -275,7 +291,7 @@ export default function HomeScreen({ navigation }) {
               >
                 <Image
                   source={{
-                    uri: `${FileSystem.documentDirectory}/tabs/${item}/icon`,
+                    uri: `${FileSystem.documentDirectory}tabs/${item}/icon.jpeg`,
                   }}
                   style={{ flex: 1, aspectRatio: 1 }}
                   resizeMode="cover"

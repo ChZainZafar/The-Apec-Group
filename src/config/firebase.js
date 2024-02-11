@@ -13,7 +13,12 @@ import {
   where,
 } from "firebase/firestore";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  uploadBytesResumable,
+} from "firebase/storage";
 import { getDatabase, push, set, ref as realtimeRef } from "firebase/database";
 
 const firebaseConfig = {
@@ -62,7 +67,7 @@ export async function uploadImage(path, image) {
   const storageRef = ref(storage, `${path}`);
   const response = await fetch(image);
   const blob = await response.blob();
-  return uploadBytes(storageRef, blob);
+  return uploadBytesResumable(storageRef, blob);
 }
 
 export async function updateDocument(collectionName, docId, object) {

@@ -4,6 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import SigninScreen from "./src/screens/SigninScreen";
 import { ThemeProvider } from "styled-components/native";
 import { theme } from "./src/infrastructure/theme";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   useFonts as useOswold,
   Oswald_400Regular,
@@ -13,7 +14,11 @@ import SignupScreen from "./src/screens/SignupScreeen.js";
 import SelectionScreen from "./src/screens/SelectionScreen.js";
 import HomeScreen from "./src/screens/HomeScreen.js";
 import { UserContext, UserProvider } from "./src/context/UserContext.js";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+} from "@react-navigation/drawer";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
 import { useContext } from "react";
 import UsersListScreen from "./src/screens/UsersListScreen.js";
@@ -21,9 +26,14 @@ import FolderContentScreen from "./src/screens/FolderContentScreen.js";
 import FullScreen from "./src/screens/FullScreen.js";
 import TestScreen from "./src/screens/TestScreen.js";
 import PdfOpenerScreen from "./src/screens/PdfOpenerScreen.js";
+import { StatusBar } from "expo-status-bar";
+import { Button } from "react-native-paper";
+import { colors } from "./src/infrastructure/theme/colors.js";
+
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 function App() {
+  const { usertype, user, setUser } = useContext(UserContext);
   let [oswaldLoaded] = useOswold({
     Oswald_400Regular,
   });
@@ -34,10 +44,23 @@ function App() {
   if (!oswaldLoaded || !latoLoaded) {
     return null;
   }
-
+  const CustomDrawerContent = (props) => {
+    return (
+      <DrawerContentScrollView {...props}>
+        <DrawerItemList {...props} />
+        <Button
+          onPress={async () => {
+            setUser();
+            await AsyncStorage.removeItem("USER");
+          }}
+          textColor={colors.brand.primary}
+        >
+          Log Out
+        </Button>
+      </DrawerContentScrollView>
+    );
+  };
   function HomeScreens() {
-    const { usertype } = useContext(UserContext);
-
     return (
       <Drawer.Navigator
         screenOptions={{
@@ -50,6 +73,7 @@ function App() {
           headerTitle: "The Apec Group",
           drawerActiveTintColor: "white",
         }}
+        drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
         <Drawer.Screen
           name="HomeScreen"
@@ -65,33 +89,31 @@ function App() {
         )}
 
         {usertype == "admin" && (
-          <Drawer.Screen
-            name="UsersListScreen"
-            component={UsersListScreen}
-            options={{ title: "Users List" }}
-          />
-        )}
-        {usertype == "admin" && (
-          <Drawer.Screen
-            name="AddCustomerScreen"
-            component={SignupScreen}
-            initialParams={{
-              usertype: "customer",
-              isAdmin: true,
-            }}
-            options={{ title: "Add a customer" }}
-          />
-        )}
-        {usertype == "admin" && (
-          <Drawer.Screen
-            name="AddEmployeeScreen"
-            component={SignupScreen}
-            initialParams={{
-              usertype: "employee",
-              isAdmin: true,
-            }}
-            options={{ title: "Add a employee" }}
-          />
+          <>
+            <Drawer.Screen
+              name="UsersListScreen"
+              component={UsersListScreen}
+              options={{ title: "Users List" }}
+            />
+            <Drawer.Screen
+              name="AddCustomerScreen"
+              component={SignupScreen}
+              initialParams={{
+                usertype: "customer",
+                isAdmin: true,
+              }}
+              options={{ title: "Add a customer" }}
+            />
+            <Drawer.Screen
+              name="AddEmployeeScreen"
+              component={SignupScreen}
+              initialParams={{
+                usertype: "employee",
+                isAdmin: true,
+              }}
+              options={{ title: "Add a employee" }}
+            />
+          </>
         )}
       </Drawer.Navigator>
     );
@@ -110,37 +132,42 @@ function App() {
         headerTitle: "The Apec Group",
       }}
     >
-      {/* <Stack.Screen name="TestScreen" component={TestScreen} /> */}
-      <Stack.Screen name="StackSceen" component={StartScreen} />
-      <Stack.Screen name="SigninScreen" component={SigninScreen} />
-      <Stack.Screen name="SignupScreeen" component={SignupScreen} />
-      <Stack.Screen name="SelectionScreen" component={SelectionScreen} />
-      <Stack.Screen name="FullScreen" component={FullScreen} />
-      {/* <Stack.Screen name="PdfOpenerScreen" component={PdfOpenerScreen} /> */}
-
-      <Stack.Screen
-        name="FolderContentScreen"
-        component={FolderContentScreen}
-      />
-
-      <Stack.Screen
-        name="HomeScreens"
-        component={HomeScreens}
-        options={{ headerShown: false }}
-      />
+      {!user?.username ? (
+        <>
+          <Stack.Screen name="StackSceen" component={StartScreen} />
+          <Stack.Screen name="SigninScreen" component={SigninScreen} />
+          <Stack.Screen name="SignupScreeen" component={SignupScreen} />
+          <Stack.Screen name="SelectionScreen" component={SelectionScreen} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen
+            name="HomeScreens"
+            component={HomeScreens}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="FolderContentScreen"
+            component={FolderContentScreen}
+          />
+          <Stack.Screen name="FullScreen" component={FullScreen} />
+        </>
+      )}
     </Stack.Navigator>
   );
 }
 
 export default () => {
   return (
-    // <UserProvider>
-    <UserProvider>
-      <NavigationContainer independent={true}>
-        <ThemeProvider theme={theme}>
-          <App />
-        </ThemeProvider>
-      </NavigationContainer>
-    </UserProvider>
+    <>
+      <StatusBar style="light" />
+      <UserProvider>
+        <NavigationContainer independent={true}>
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
+        </NavigationContainer>
+      </UserProvider>
+    </>
   );
 };

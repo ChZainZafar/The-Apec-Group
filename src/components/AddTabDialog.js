@@ -36,10 +36,7 @@ export default function AddTabDialog({ visible, onDismiss, setFolderId }) {
       try {
         setLoading(true);
         const id = Math.floor(1000000 + Math.random() * 900000);
-        const snapshot = await uploadImage(
-          `tabs/${order}_${id}/icon`,
-          tabImage
-        );
+        await uploadImage(`tabs/${order}_${id}/icon`, tabImage);
 
         setLoading(false);
         console.log("added");

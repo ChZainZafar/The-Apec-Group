@@ -8,7 +8,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
+import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
 import AddImageDialog from "../components/AddImageDialog";
 import AddVideoDialog from "../components/AddVideoDialog";
@@ -32,7 +34,7 @@ export default function FolderContentScreen({ route, navigation }) {
   const [documents, setDocuments] = useState(null);
 
   const [checked, setChecked] = useState("Images");
-  const { folder } = route.params;
+  const folder = (route?.params || {})?.folder;
   const [updatedFolder, setUpdatedFolder] = useState(folder ? folder : null);
   const { usertype } = useContext(UserContext);
   const windowHeight = Dimensions.get("window").height;
@@ -74,12 +76,14 @@ export default function FolderContentScreen({ route, navigation }) {
   async function openPdf(uri) {
     try {
       const cUri = await FileSystem.getContentUriAsync(uri);
-
-      await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-        data: cUri,
-        flags: 1,
-        type: "application/pdf",
-      });
+      if (Platform.OS == "ios")
+        await Sharing.shareAsync(cUri, { UTI: "public.item" });
+      else
+        await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
+          data: cUri,
+          flags: 1,
+          type: "application/pdf",
+        });
     } catch (e) {
       console.log(e.message);
     }
@@ -104,7 +108,7 @@ export default function FolderContentScreen({ route, navigation }) {
           />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 16 }}>Docuements</Text>
+          <Text style={{ fontSize: 16 }}>Documents</Text>
           <RadioButton
             value="Documents"
             status={checked === "Documents" ? "checked" : "unchecked"}
