@@ -297,10 +297,16 @@ export default function HomeScreen({ navigation }) {
                       `${FileSystem.documentDirectory}tabs/${item}/icon` +
                       (Platform.OS == "ios" ? ".jpeg" : ""),
                   }}
-                  style={{ flex: 1, aspectRatio: 1 }}
+                  style={{
+                    flex: 1,
+                    aspectRatio: 1,
+                    borderWidth: 1,
+                    borderColor: "rgba(0,0,0,0.1)",
+                    margin: 1,
+                    marginBottom: 2,
+                  }}
                   resizeMode="cover"
                 />
-                <Text>{item}</Text>
               </TouchableOpacity>
             );
           }}

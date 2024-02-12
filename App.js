@@ -132,6 +132,7 @@ function App() {
           fontWeight: "bold",
         },
         headerTitle: "The Apec Group",
+        headerBackTitle: "Back",
       }}
     >
       {!user?.username ? (
