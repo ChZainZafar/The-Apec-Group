@@ -108,7 +108,6 @@ export default function HomeScreen({ navigation }) {
       const dirUri =
         FileSystem.documentDirectory + path.substring(0, path.lastIndexOf("/"));
       await ensureDirExists(dirUri); // Ensure the directory exists
-
       const fileUri = FileSystem.documentDirectory + path + (extension || "");
       const downloadResult = await FileSystem.downloadAsync(fileUrl, fileUri);
       console.log("File downloaded to:", downloadResult.uri);
@@ -282,6 +281,7 @@ export default function HomeScreen({ navigation }) {
           )}
           numColumns={Math.floor(windowWidth / 150)} // Adjust the constant value as needed
           renderItem={({ item }) => {
+            console.log(`${FileSystem.documentDirectory}tabs/${item}/icon`);
             return (
               <TouchableOpacity
                 style={{ flex: 1, margin: 0 }} // Adjust the margin as needed

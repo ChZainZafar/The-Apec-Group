@@ -112,10 +112,9 @@ export default function SigninScreen({ navigation, route }) {
       >
         <Toast />
       </View>
-      <View style={{ flex: 0.33 }}>
+      <View style={{ flex: 0.33, backgroundColor: "white" }}>
         <Logo height={"100%"} width={"100%"} />
       </View>
-      <Sepreator />
       <View
         style={{
           flex: 0.6,

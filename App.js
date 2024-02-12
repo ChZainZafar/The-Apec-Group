@@ -77,6 +77,12 @@ function App() {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
       >
         <Drawer.Screen
+          name="StartScreen"
+          component={StartScreen}
+          options={{ title: "Start" }}
+          initialParams={{ isStart: false }}
+        />
+        <Drawer.Screen
           name="HomeScreen"
           component={HomeScreen}
           options={{ title: "Home" }}
@@ -114,7 +120,11 @@ function App() {
               }}
               options={{ title: "Add a employee" }}
             />
-            <Drawer.Screen name="MessageScreen" component={MessageScreen} />
+            <Drawer.Screen
+              name="MessageScreen"
+              component={MessageScreen}
+              options={{ title: "Messages" }}
+            />
           </>
         )}
       </Drawer.Navigator>
@@ -137,7 +147,11 @@ function App() {
     >
       {!user?.username ? (
         <>
-          <Stack.Screen name="StackSceen" component={StartScreen} />
+          <Stack.Screen
+            name="StackSceen"
+            component={StartScreen}
+            initialParams={{ isStart: true }}
+          />
           <Stack.Screen name="SigninScreen" component={SigninScreen} />
           <Stack.Screen name="SignupScreeen" component={SignupScreen} />
           <Stack.Screen name="SelectionScreen" component={SelectionScreen} />

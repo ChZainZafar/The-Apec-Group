@@ -6,24 +6,29 @@ import AddMessageDialog from "../components/AddMessgaeDialog";
 import { getAllDocuments } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import { UserContext } from "../context/UserContext";
+import { ActivityIndicator } from "react-native-paper";
 
 export default function MessageScreen() {
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   // Initialize messages as an empty array
   const [messages, setMessages] = useState([]);
+  const [isMessageLoading, setIsMessageLoading] = useState(false);
   const { usertype } = useContext(UserContext);
   const scrollViewRef = useRef();
   const fetchMessages = async () => {
     try {
       // Assuming getAllDocuments is correctly implemented to eventually call setMessages
+      setIsMessageLoading(true);
       const unsubscribe = await getAllDocuments(
         firestoreCollections.MESSAGES_COLLECTION,
         (fetchedMessages) => {
           // Ensure fetchedMessages is an array before setting state
           if (Array.isArray(fetchedMessages)) {
             setMessages(fetchedMessages);
+            setIsMessageLoading(false);
           } else {
             console.error("fetchedMessages is not an array:", fetchedMessages);
+            setIsMessageLoading(false);
           }
         }
       );
@@ -80,30 +85,51 @@ export default function MessageScreen() {
 
   return (
     <>
-      <ScrollView
-        style={styles.container}
-        ref={scrollViewRef}
-        onContentSizeChange={() =>
-          scrollViewRef.current.scrollToEnd({ animated: true })
-        }
-        onLayout={() => scrollViewRef.current.scrollToEnd({ animated: true })}
-      >
-        {sortedAndFilteredMessages.map((message, index) => (
-          <View key={index} style={styles.messageContainer}>
-            {renderMessageContent(message)}
-          </View>
-        ))}
-      </ScrollView>
+      {isMessageLoading ? (
+        <View
+          style={{
+            flex: 1,
+            height: "100%",
+            width: "100%",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator
+            size={"large"}
+            color={theme.colors.brand.primary}
+            style={{ zIndex: 3000 }}
+          />
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.container}
+          ref={scrollViewRef}
+          onContentSizeChange={() =>
+            scrollViewRef.current.scrollToEnd({ animated: true })
+          }
+          onLayout={() => scrollViewRef.current.scrollToEnd({ animated: true })}
+        >
+          {sortedAndFilteredMessages.map((message, index) => (
+            <View key={index} style={styles.messageContainer}>
+              {renderMessageContent(message)}
+            </View>
+          ))}
+        </ScrollView>
+      )}
 
-      <Icon
-        name="add-circle"
-        color={theme.colors.brand.primary}
-        size={40}
-        style={styles.addButton}
-        onPress={() => {
-          setIsMessageDialogOpen(true);
-        }}
-      />
+      {usertype == "admin" && (
+        <Icon
+          name="add-circle"
+          color={theme.colors.brand.primary}
+          size={40}
+          style={styles.addButton}
+          onPress={() => {
+            setIsMessageDialogOpen(true);
+          }}
+        />
+      )}
+
       <AddMessageDialog
         visible={isMessageDialogOpen}
         onDismiss={() => {

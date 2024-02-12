@@ -4,7 +4,7 @@ export default function Logo({ height, width }) {
   return (
     <Image
       style={{ height: height, width: width }}
-      source={require("../../assets/Logo.png")}
+      source={require("../../assets/Logo.jpg")}
       resizeMode="contain"
     />
   );

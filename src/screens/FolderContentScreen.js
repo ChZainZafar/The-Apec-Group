@@ -90,7 +90,13 @@ export default function FolderContentScreen({ route, navigation }) {
   }
   return (
     <View style={{ width: "100%", height: "100%", paddingHorizontal: "8%" }}>
-      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          flexWrap: "wrap",
+        }}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <CheckBox
             title="Images"
