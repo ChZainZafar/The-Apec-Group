@@ -54,7 +54,13 @@ export default function SignupScreen({ navigation, route }) {
 
   return (
     <>
-      <Toast />
+      <View
+        style={{
+          zIndex: Number.MIN_SAFE_INTEGER,
+        }}
+      >
+        <Toast />
+      </View>
       <View style={{ flex: 0.33 }}>
         <Logo height={"100%"} width={"100%"} />
       </View>

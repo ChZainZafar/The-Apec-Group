@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
 } from "react-native";
 import Button from "../components/Button";
 import { useContext, useEffect, useState } from "react";
@@ -98,8 +99,9 @@ export default function HomeScreen({ navigation }) {
       const metadata = await getMetadata(fileRef);
       let extension = metadata.contentType.split("/");
       if (extension.length > 0) {
-        if (extension[1] == "pdf") extension = "";
-        else if (extension[0] == "image") extension = ".jpeg";
+        if (["pdf", "plain"].includes(extension[1])) extension = "";
+        else if (extension[1] == "quicktime") extension = ".mp4";
+        else if (metadata.fullPath.search("icon") != -1) extension = ".jpeg";
         else extension = `.${extension[1]}`;
       } else throw "";
 
@@ -155,7 +157,7 @@ export default function HomeScreen({ navigation }) {
           let imagePathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/images/${imagesNames[imageIndex]}`;
           const fileRef = ref(storage, imagePathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(imagePath, downloadUrl, fileRef);
+          await downloadFile(imagePath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/images`);
@@ -171,7 +173,7 @@ export default function HomeScreen({ navigation }) {
           let videoPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
           const fileRef = ref(storage, videoPathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(videoPath, downloadUrl, fileRef);
+          await downloadFile(videoPath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/videos`);
@@ -187,7 +189,7 @@ export default function HomeScreen({ navigation }) {
           let documentPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
           const fileRef = ref(storage, documentPathS);
           const downloadUrl = await getDownloadURL(fileRef);
-          downloadFile(documentPath, downloadUrl, fileRef);
+          await downloadFile(documentPath, downloadUrl, fileRef);
         }
       } else {
         makeDirectory(`tabs/${tabNames[tabIndex]}/documents`);
@@ -200,7 +202,7 @@ export default function HomeScreen({ navigation }) {
       let iconPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/${filesInTab[0]}`;
       const fileRef = ref(storage, iconPathS);
       const downloadUrl = await getDownloadURL(fileRef);
-      downloadFile(iconPath, downloadUrl, fileRef);
+      await downloadFile(iconPath, downloadUrl, fileRef);
     }
     setIsSyncing(false);
     getTabsL();
@@ -291,7 +293,9 @@ export default function HomeScreen({ navigation }) {
               >
                 <Image
                   source={{
-                    uri: `${FileSystem.documentDirectory}tabs/${item}/icon.jpeg`,
+                    uri:
+                      `${FileSystem.documentDirectory}tabs/${item}/icon` +
+                      (Platform.OS == "ios" ? ".jpeg" : ""),
                   }}
                   style={{ flex: 1, aspectRatio: 1 }}
                   resizeMode="cover"

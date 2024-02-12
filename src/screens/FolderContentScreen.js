@@ -4,7 +4,6 @@ import {
   Dimensions,
   FlatList,
   Image,
-  Linking,
   Text,
   TouchableOpacity,
   View,
@@ -17,13 +16,14 @@ import AddVideoDialog from "../components/AddVideoDialog";
 import AddDocumentDialog from "../components/AddDocumentDialog.js";
 
 import Toast from "react-native-toast-message";
-import { ActivityIndicator, RadioButton } from "react-native-paper";
 import VideoPlayer from "expo-video-player";
 import { ResizeMode } from "expo-av";
 import Sepreator from "../components/Seperator";
 import { UserContext } from "../context/UserContext";
 import * as FileSystem from "expo-file-system";
 import * as IntentLauncher from "expo-intent-launcher";
+import { CheckBox } from "react-native-elements";
+import { getRadioButtonStyleProps } from "../utils/commonFunctions.js";
 export default function FolderContentScreen({ route, navigation }) {
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
@@ -92,27 +92,27 @@ export default function FolderContentScreen({ route, navigation }) {
     <View style={{ width: "100%", height: "100%", paddingHorizontal: "8%" }}>
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 16 }}>Images</Text>
-          <RadioButton
-            value="Images"
-            status={checked === "Images" ? "checked" : "unchecked"}
+          <CheckBox
+            title="Images"
+            checked={checked === "Images"}
             onPress={() => setChecked("Images")}
+            {...getRadioButtonStyleProps()}
           />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 16 }}>Videos</Text>
-          <RadioButton
-            value="Videos"
-            status={checked === "Videos" ? "checked" : "unchecked"}
+          <CheckBox
+            title="Videos"
+            checked={checked === "Videos"}
             onPress={() => setChecked("Videos")}
+            {...getRadioButtonStyleProps()}
           />
         </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text style={{ fontSize: 16 }}>Documents</Text>
-          <RadioButton
-            value="Documents"
-            status={checked === "Documents" ? "checked" : "unchecked"}
+          <CheckBox
+            title="Documents"
+            checked={checked === "Documents"}
             onPress={() => setChecked("Documents")}
+            {...getRadioButtonStyleProps()}
           />
         </View>
       </View>
@@ -124,11 +124,12 @@ export default function FolderContentScreen({ route, navigation }) {
           numColumns={3}
           renderItem={({ item }) => {
             // console.log("item: ", item);
+            const uri = `${FileSystem.documentDirectory}/tabs/${folder}/images/${item}`;
             return (
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("FullScreen", {
-                    url: item,
+                    url: uri,
                     contentType: "image",
                   });
                 }}
@@ -138,9 +139,12 @@ export default function FolderContentScreen({ route, navigation }) {
                   style={{
                     height: "100%",
                     width: "100%",
+                    borderWidth: 1,
+                    borderColor: "rgba(0,0,0,0.1)",
+                    borderRadius: 4,
                   }}
                   source={{
-                    uri: `${FileSystem.documentDirectory}/tabs/${folder}/images/${item}`,
+                    uri,
                   }}
                   resizeMode="cover"
                 />
