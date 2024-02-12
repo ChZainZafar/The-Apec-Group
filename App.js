@@ -29,6 +29,7 @@ import PdfOpenerScreen from "./src/screens/PdfOpenerScreen.js";
 import { StatusBar } from "expo-status-bar";
 import { Button } from "react-native-paper";
 import { colors } from "./src/infrastructure/theme/colors.js";
+import MessageScreen from "./src/screens/MessageScreen.js";
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -113,6 +114,7 @@ function App() {
               }}
               options={{ title: "Add a employee" }}
             />
+            <Drawer.Screen name="MessageScreen" component={MessageScreen} />
           </>
         )}
       </Drawer.Navigator>

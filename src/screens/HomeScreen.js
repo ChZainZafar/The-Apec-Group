@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
 } from "react-native";
 import Button from "../components/Button";
 import { useContext, useEffect, useState } from "react";
@@ -291,7 +292,10 @@ export default function HomeScreen({ navigation }) {
               >
                 <Image
                   source={{
-                    uri: `${FileSystem.documentDirectory}tabs/${item}/icon.jpeg`,
+                    uri:
+                      Platform.OS == "android"
+                        ? `${FileSystem.documentDirectory}tabs/${item}/icon`
+                        : `${FileSystem.documentDirectory}tabs/${item}/icon.jpeg`,
                   }}
                   style={{ flex: 1, aspectRatio: 1 }}
                   resizeMode="cover"
