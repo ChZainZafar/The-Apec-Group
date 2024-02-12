@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
-import { RadioButton } from "react-native-paper";
 import Sepreator from "../components/Seperator";
-import { getAllDocuments, getUser } from "../config/firebase";
+import { getAllDocuments } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import UserDialog from "../components/UserDialog.js";
 import Toast from "react-native-toast-message";
+import { CheckBox } from "react-native-elements";
+import { getRadioButtonStyleProps } from "../utils/commonFunctions.js";
 
 export default function UsersListScreen() {
   const [checked, setChecked] = useState("All");
@@ -34,7 +35,10 @@ export default function UsersListScreen() {
     if (!users) return [];
 
     if (checked === "All") {
-      return users.filter((user) => user && user.usertype !== "admin");
+      // Add condition of user.isApproved
+      return users.filter(
+        (user) => user && user.usertype !== "admin" && user.isApproved
+      );
     } else if (checked === "Pending") {
       return users.filter(
         (user) =>
@@ -62,11 +66,11 @@ export default function UsersListScreen() {
             marginHorizontal: 4,
           }}
         >
-          <Text style={{ fontSize: 16 }}>All</Text>
-          <RadioButton
-            value="All"
-            status={checked === "All" ? "checked" : "unchecked"}
+          <CheckBox
+            title="All"
+            checked={checked === "All"}
             onPress={() => setChecked("All")}
+            {...getRadioButtonStyleProps()}
           />
         </View>
         <View
@@ -76,11 +80,11 @@ export default function UsersListScreen() {
             marginHorizontal: 4,
           }}
         >
-          <Text style={{ fontSize: 16 }}>Pending</Text>
-          <RadioButton
-            value="Pending"
-            status={checked === "Pending" ? "checked" : "unchecked"}
+          <CheckBox
+            title="Pending"
+            checked={checked === "Pending"}
             onPress={() => setChecked("Pending")}
+            {...getRadioButtonStyleProps()}
           />
         </View>
       </View>

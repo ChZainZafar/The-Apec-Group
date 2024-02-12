@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import Button from "./Button";
 import { updateDocument } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
-import { showToast } from "../utils/commonFunctions";
+import { sendEmail, showToast } from "../utils/commonFunctions";
 import { useState } from "react";
 export default function UserDialog({ user, visible, onDismiss }) {
   const [loading, setLoading] = useState(false);
@@ -12,6 +12,13 @@ export default function UserDialog({ user, visible, onDismiss }) {
   async function ApproveUser() {
     try {
       setLoading(true);
+      const email_payload = {
+        from_name: "The ACE Group",
+        from_email: "contact@theacegroup.com",
+        to: "abdullaharif789@gmail.com",
+        html_body: `<body style='font-family:Arial,sans-serif;background-color:#f4f4f4;padding:20px'><table style='max-width:600px;margin:0 auto;background-color:#fff;padding:20px;border-radius:10px'><tr><td style='text-align:center'><img src='https://i.ibb.co/QJczwx6/Logo.png' alt='The ACE Group Logo' style='max-width:150px'></td></tr><tr><td style='padding:20px'><h2 style='color:#333'>Congratulations!</h2><p style='color:#333;font-size:16px;line-height:1.6'>Dear ${user.username},</p><p style='color:#333;font-size:16px;line-height:1.6'>We are thrilled to inform you that your application has been approved at The ACE Group. Your hard work and dedication have paid off, and we are excited to welcome you to our team.</p><p style='color:#333;font-size:16px;line-height:1.6'>We believe that you will make valuable contributions to our company, and we look forward to working together towards shared success.</p><p style='color:#333;font-size:16px;line-height:1.6'>Once again, congratulations on this achievement!</p><p style='color:#333;font-size:16px;line-height:1.6'>Best regards,<br>The ACE Group Team</p></td></tr></table></body>`,
+        subject: "Invitation",
+      };
       await updateDocument(
         firestoreCollections.USER_COLLECTION,
         user.username,
@@ -19,6 +26,7 @@ export default function UserDialog({ user, visible, onDismiss }) {
           isApproved: true,
         }
       );
+      sendEmail(email_payload);
       setLoading(false);
 
       showToast("success", `${user.username} has been approved`);
