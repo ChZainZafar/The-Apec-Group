@@ -101,7 +101,8 @@ export default function HomeScreen({ navigation }) {
       if (extension.length > 0) {
         if (["pdf", "plain"].includes(extension[1])) extension = "";
         else if (extension[1] == "quicktime") extension = ".mp4";
-        else if (metadata.fullPath.search("icon") != -1) extension = ".jpeg";
+        else if (metadata.fullPath.search("icon") != -1)
+          extension = Platform.OS == "ios" ? ".jpeg" : "";
         else extension = `.${extension[1]}`;
       } else throw "";
 
