@@ -27,8 +27,7 @@ import {
 } from "firebase/storage";
 import * as FileSystem from "expo-file-system";
 import { showToast } from "../utils/commonFunctions.js";
-
-const windowWidth = Dimensions.get("window").width;
+import * as Device from "expo-device";
 
 export default function HomeScreen({ navigation }) {
   const { usertype } = useContext(UserContext);
@@ -36,8 +35,18 @@ export default function HomeScreen({ navigation }) {
   const [folders, setFolders] = useState(null);
   const [folderId, setFolderId] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const BASEURL_TABS = "gs://fir-db-project-798a3.appspot.com/tabs";
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
 
+  useEffect(() => {
+    const thresholdWidth = 768; // You can adjust this threshold as needed
+    setIsLargeScreen(Math.min(windowWidth, windowHeight) >= thresholdWidth);
+  }, []);
+
+  const numColumns = 2;
+
+  const BASEURL_TABS = "gs://the-apec-group.appspot.com/tabs";
+  const windowWidth = Dimensions.get("window").width;
+  const windowHeight = Dimensions.get("window").height;
   async function makeDirectory(path) {
     const dirUri = FileSystem.documentDirectory + path;
     await FileSystem.makeDirectoryAsync(dirUri, { intermediates: true });
@@ -241,7 +250,13 @@ export default function HomeScreen({ navigation }) {
   console.log("folders", folders);
   return (
     <View style={{ flex: 1, width: "100%", paddingHorizontal: 15 }}>
-      <Toast />
+      <View
+        style={{
+          zIndex: Number.MAX_SAFE_INTEGER,
+        }}
+      >
+        <Toast />
+      </View>
 
       {folders == null || isSyncing == true ? (
         <View
@@ -280,7 +295,7 @@ export default function HomeScreen({ navigation }) {
           data={folders.sort(
             (a, b) => parseInt(a.split("_")[0]) - parseInt(b.split("_")[0])
           )}
-          numColumns={Math.floor(windowWidth / 150)} // Adjust the constant value as needed
+          numColumns={numColumns} // Use the state variable
           renderItem={({ item }) => {
             console.log(`${FileSystem.documentDirectory}tabs/${item}/icon`);
             return (
@@ -305,6 +320,8 @@ export default function HomeScreen({ navigation }) {
                     borderColor: "rgba(0,0,0,0.1)",
                     margin: 1,
                     marginBottom: 2,
+                    width: "100%",
+                    // Optionally adjust the size more specifically for tablets here
                   }}
                   resizeMode="cover"
                 />

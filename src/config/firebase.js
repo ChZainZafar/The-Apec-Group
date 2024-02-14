@@ -19,22 +19,27 @@ import {
   uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
-import { getDatabase, push, set, ref as realtimeRef } from "firebase/database";
+// import { getDatabase, push, set, ref as realtimeRef } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDQpEVlbvscQUU7E3FehvPe1WEwNbluw8Q",
-  authDomain: "fir-db-project-798a3.firebaseapp.com",
-  projectId: "fir-db-project-798a3",
-  storageBucket: "fir-db-project-798a3.appspot.com",
-  messagingSenderId: "298867210644",
-  appId: "1:298867210644:web:418ac465a3624d2ffb7781",
-  databaseURL: "https://apptua-d309f-default-rtdb.firebaseio.com",
-};
+  apiKey: "AIzaSyAPuKmbdLmC_2SHmKSDH-ttCCut2NCf1MA",
 
+  authDomain: "the-apec-group.firebaseapp.com",
+
+  projectId: "the-apec-group",
+
+  storageBucket: "the-apec-group.appspot.com",
+
+  messagingSenderId: "279711096475",
+
+  appId: "1:279711096475:web:ab2837b62b65440efb303e",
+
+  measurementId: "G-NW804K42PP",
+};
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
-const database = getDatabase(app);
+// const database = getDatabase(app);
 
 export function addUser(user, collection) {
   return setDoc(doc(db, collection, user.username), user);
@@ -89,27 +94,27 @@ export async function uploadDocument(path, documentUri) {
   const storageRef = ref(storage, `${path}`);
   const response = await fetch(documentUri);
   const blob = await response.blob();
-  return uploadBytes(storageRef, blob);
+  return uploadBytesResumable(storageRef, blob);
 }
 
-export async function sendMessage(currentName, guestName, message) {
-  return set(
-    push(realtimeRef(database, `theApecGroup/${currentName}/${guestName}`)),
-    {
-      sender: currentName,
-      reciever: guestName,
-      message: message,
-    }
-  );
-}
+// export async function sendMessage(currentName, guestName, message) {
+//   return set(
+//     push(realtimeRef(database, `theApecGroup/${currentName}/${guestName}`)),
+//     {
+//       sender: currentName,
+//       reciever: guestName,
+//       message: message,
+//     }
+//   );
+// }
 
-export async function recieveMessage(currentName, guestName, message) {
-  return set(
-    push(realtimeRef(database, `theApecGroup/${guestName}/${currentName}`)),
-    {
-      sender: currentName,
-      reciever: guestName,
-      message: message,
-    }
-  );
-}
+// export async function recieveMessage(currentName, guestName, message) {
+//   return set(
+//     push(realtimeRef(database, `theApecGroup/${guestName}/${currentName}`)),
+//     {
+//       sender: currentName,
+//       reciever: guestName,
+//       message: message,
+//     }
+//   );
+// }

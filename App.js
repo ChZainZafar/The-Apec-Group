@@ -20,7 +20,7 @@ import {
   DrawerItemList,
 } from "@react-navigation/drawer";
 import ProfileScreen from "./src/screens/ProfileScreen.js";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import UsersListScreen from "./src/screens/UsersListScreen.js";
 import FolderContentScreen from "./src/screens/FolderContentScreen.js";
 import FullScreen from "./src/screens/FullScreen.js";
@@ -30,10 +30,27 @@ import { StatusBar } from "expo-status-bar";
 import { Button } from "react-native-paper";
 import { colors } from "./src/infrastructure/theme/colors.js";
 import MessageScreen from "./src/screens/MessageScreen.js";
+import * as Device from "expo-device";
+import * as ScreenOrientation from "expo-screen-orientation";
 
+async function changeScreenOrientation() {
+  const isTablet = await Device.isTabletAsync();
+  if (isTablet) {
+    await ScreenOrientation.lockAsync(
+      ScreenOrientation.OrientationLock.LANDSCAPE
+    );
+  } else {
+    await ScreenOrientation.lockAsync(
+      ScreenOrientation.OrientationLock.PORTRAIT
+    );
+  }
+}
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 function App() {
+  useEffect(() => {
+    changeScreenOrientation();
+  });
   const { usertype, user, setUser } = useContext(UserContext);
   let [oswaldLoaded] = useOswold({
     Oswald_400Regular,
@@ -94,7 +111,11 @@ function App() {
             options={{ title: "Profile" }}
           />
         )}
-
+        <Drawer.Screen
+          name="MessageScreen"
+          component={MessageScreen}
+          options={{ title: "Messages" }}
+        />
         {usertype == "admin" && (
           <>
             <Drawer.Screen
@@ -119,11 +140,6 @@ function App() {
                 isAdmin: true,
               }}
               options={{ title: "Add a employee" }}
-            />
-            <Drawer.Screen
-              name="MessageScreen"
-              component={MessageScreen}
-              options={{ title: "Messages" }}
             />
           </>
         )}

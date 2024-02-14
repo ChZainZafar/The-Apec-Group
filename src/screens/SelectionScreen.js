@@ -6,7 +6,7 @@ import Button from "../components/Button";
 export default function SelectionScreen({ navigation }) {
   return (
     <>
-      <View style={{ flex: 0.35, width: "100%" }}>
+      <View style={{ flex: 0.35, width: "100%", backgroundColor: "white" }}>
         <Logo height={"100%"} width={"100%"} />
       </View>
       <Sepreator />

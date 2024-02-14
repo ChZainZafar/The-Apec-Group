@@ -59,7 +59,13 @@ export default function MessageScreen() {
           : 0;
       return aTime - bTime;
     })
-    .filter((msg) => usertype === "admin" || msg.usertype === usertype);
+    .filter((msg) => {
+      return (
+        usertype === "admin" ||
+        msg.usertype == "Both" ||
+        msg.usertype === usertype
+      );
+    });
   const renderMessageContent = (message) => {
     switch (message.messageType) {
       case "Text":
