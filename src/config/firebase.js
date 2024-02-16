@@ -19,7 +19,7 @@ import {
   uploadBytes,
   uploadBytesResumable,
 } from "firebase/storage";
-// import { getDatabase, push, set, ref as realtimeRef } from "firebase/database";
+import { getDatabase, push, set, ref as realtimeRef } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAPuKmbdLmC_2SHmKSDH-ttCCut2NCf1MA",
@@ -36,6 +36,16 @@ const firebaseConfig = {
 
   measurementId: "G-NW804K42PP",
 };
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDQpEVlbvscQUU7E3FehvPe1WEwNbluw8Q",
+//   authDomain: "fir-db-project-798a3.firebaseapp.com",
+//   databaseURL: "https://fir-db-project-798a3-default-rtdb.firebaseio.com",
+//   projectId: "fir-db-project-798a3",
+//   storageBucket: "fir-db-project-798a3.appspot.com",
+//   messagingSenderId: "298867210644",
+//   appId: "1:298867210644:web:418ac465a3624d2ffb7781",
+// };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);

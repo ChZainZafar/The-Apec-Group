@@ -32,6 +32,7 @@ import { colors } from "./src/infrastructure/theme/colors.js";
 import MessageScreen from "./src/screens/MessageScreen.js";
 import * as Device from "expo-device";
 import * as ScreenOrientation from "expo-screen-orientation";
+import VideoPlayerScreen from "./src/screens/VideoPlayerScreen.js";
 
 async function changeScreenOrientation() {
   const isTablet = await Device.isTabletAsync();
@@ -50,7 +51,7 @@ const Drawer = createDrawerNavigator();
 function App() {
   useEffect(() => {
     changeScreenOrientation();
-  });
+  }, []);
   const { usertype, user, setUser } = useContext(UserContext);
   let [oswaldLoaded] = useOswold({
     Oswald_400Regular,
@@ -104,6 +105,7 @@ function App() {
           component={HomeScreen}
           options={{ title: "Home" }}
         />
+        {/* <Drawer.Screen name="PdfOpenerScreen" component={PdfOpenerScreen} /> */}
         {usertype != "admin" && (
           <Drawer.Screen
             name="ProfileScreen"
@@ -184,6 +186,10 @@ function App() {
             component={FolderContentScreen}
           />
           <Stack.Screen name="FullScreen" component={FullScreen} />
+          <Stack.Screen
+            name="VideoPlayerScreen"
+            component={VideoPlayerScreen}
+          />
         </>
       )}
     </Stack.Navigator>

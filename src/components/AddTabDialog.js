@@ -14,7 +14,7 @@ export default function AddTabDialog({ visible, onDismiss, setFolderId }) {
   const [tabImage, setTabImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [order, setOrder] = useState("");
-  console.log(new Date().toISOString());
+  // console.log(new Date().toISOString());
   const pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({

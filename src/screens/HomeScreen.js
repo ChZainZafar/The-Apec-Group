@@ -36,7 +36,19 @@ export default function HomeScreen({ navigation }) {
   const [folderId, setFolderId] = useState(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isLargeScreen, setIsLargeScreen] = useState(false);
+  const [screenData, setScreenData] = useState(Dimensions.get("window"));
 
+  const onChange = () => {
+    setScreenData(Dimensions.get("window"));
+  };
+
+  useEffect(() => {
+    Dimensions.addEventListener("change", onChange);
+    return () => Dimensions.removeEventListener("change", onChange);
+  }, []);
+
+  // Determine if the current orientation is landscape
+  const isLandscape = screenData.width > screenData.height;
   useEffect(() => {
     const thresholdWidth = 768; // You can adjust this threshold as needed
     setIsLargeScreen(Math.min(windowWidth, windowHeight) >= thresholdWidth);
@@ -98,7 +110,7 @@ export default function HomeScreen({ navigation }) {
   const ensureDirExists = async (path) => {
     const dirInfo = await FileSystem.getInfoAsync(path);
     if (!dirInfo.exists) {
-      console.log("Directory doesn't exist, creating...");
+      // console.log("Directory doesn't exist, creating...");
       await FileSystem.makeDirectoryAsync(path, { intermediates: true });
     }
   };
@@ -120,15 +132,200 @@ export default function HomeScreen({ navigation }) {
       await ensureDirExists(dirUri); // Ensure the directory exists
       const fileUri = FileSystem.documentDirectory + path + (extension || "");
       const downloadResult = await FileSystem.downloadAsync(fileUrl, fileUri);
-      console.log("File downloaded to:", downloadResult.uri);
+      // console.log("File downloaded to:", downloadResult.uri);
       return downloadResult.uri;
     } catch (error) {
       console.error("Error downloading file:", error);
       return null;
     }
   };
-  async function syncData() {
-    setIsSyncing(true);
+  const listFolders = async (path) => {
+    const dirInfo = await FileSystem.getInfoAsync(
+      FileSystem.documentDirectory + path
+    );
+
+    if (dirInfo.exists) {
+      try {
+        const fullDirUri = FileSystem.documentDirectory + path;
+        // console.log("FULL URI", fullDirUri);
+        const items = await FileSystem.readDirectoryAsync(fullDirUri);
+        const folders = [];
+
+        if (items.length > 0) {
+          // console.log("items", items);
+          for (const item of items) {
+            const itemUri = `${fullDirUri}/${item}`;
+            const info = await FileSystem.getInfoAsync(itemUri);
+            if (info.isDirectory) {
+              folders.push(item);
+            }
+          }
+        } else {
+          console.log("No items found");
+        }
+        return folders;
+      } catch (error) {
+        console.error("Error listing folders:", error);
+        return [];
+      }
+    } else {
+      console.log("Dir does not exist: ", path);
+      return [];
+    }
+  };
+  const listFiles = async (path) => {
+    const dirInfo = await FileSystem.getInfoAsync(
+      FileSystem.documentDirectory + path
+    );
+
+    if (dirInfo.exists) {
+      try {
+        const fullDirUri = FileSystem.documentDirectory + path;
+        // console.log("FULL URI", fullDirUri);
+        const items = await FileSystem.readDirectoryAsync(fullDirUri);
+        const files = [];
+
+        if (items.length > 0) {
+          console.log("LOCAL FILES GOT: ", items);
+          for (const item of items) {
+            // console.log("item", item);
+            const itemUri = `${fullDirUri}/${item}`;
+            // console.log(itemUri);
+            const info = await FileSystem.getInfoAsync(itemUri);
+            if (!info.isDirectory) {
+              files.push(item);
+            }
+          }
+        } else {
+          console.log("No items got");
+        }
+        // console.log("Files:", files);
+        return files;
+      } catch (error) {
+        console.error("Error listing files:", error);
+        return [];
+      }
+    } else {
+      console.log("Dir does not exists: ", path);
+
+      return [];
+    }
+  };
+  function removeItemOnce(arr, value) {
+    var index = arr.indexOf(value);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return arr;
+  }
+  function removeTextAfterLastDot(text) {
+    // if (arr.length > 0) {
+    // return arr.map((item) => {
+    // Find the last index of the dot character
+    const lastIndex = text.lastIndexOf(".");
+    // If there's no dot, return the item as is
+    if (lastIndex === -1) return text;
+    // Otherwise, return the substring up to the last dot
+    return text.substring(0, lastIndex);
+    // });
+    // } else {
+    //   return arr;
+    // }
+  }
+
+  function ifInclude(arr, text, type) {
+    console.log("IF INCLUDE: ARRAY: ", arr, "TEXT", text);
+    for (let arrIndex = 0; arrIndex < arr.length; arrIndex++) {
+      if (type == "documents") {
+        if (arr[arrIndex] == text) {
+          return true;
+        }
+      } else {
+        if (removeTextAfterLastDot(arr[arrIndex]) == text) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function ifRemove(arr, text, type) {
+    for (let arrIndex = 0; arrIndex < arr.length; arrIndex++) {
+      // console.log(
+      //   "removeTextAfterLastDot(arr[arrIndex]",
+      //   removeTextAfterLastDot(arr[arrIndex])
+      // );
+      // console.log("text", text);
+      if (type == "documents") {
+        if (arr[arrIndex] == text) {
+          return arrIndex;
+        }
+      } else {
+        if (removeTextAfterLastDot(arr[arrIndex]) == text) {
+          return arrIndex;
+        }
+      }
+    }
+    return -1;
+  }
+
+  async function matchAndDownload(
+    localArray,
+    globalArray,
+    tabNameIndex,
+    subFolderName
+  ) {
+    const storage = getStorage();
+    if (globalArray.length > 0) {
+      console.log(`LOCAL ${subFolderName} ARRAY`, localArray);
+      console.log(`GLOBAL ${subFolderName} ARRAY`, globalArray);
+      for (let index = 0; index < globalArray.length; index++) {
+        if (!ifInclude(localArray, globalArray[index], subFolderName)) {
+          try {
+            let imagePath = `tabs/${tabNameIndex}/${subFolderName}/${globalArray[index]}`;
+            let imagePathS = `${BASEURL_TABS}/${tabNameIndex}/${subFolderName}/${globalArray[index]}`;
+            const fileRef = ref(storage, imagePathS);
+            const downloadUrl = await getDownloadURL(fileRef);
+            await downloadFile(imagePath, downloadUrl, fileRef);
+
+            localArray = removeItemOnce(
+              localArray,
+              localArray[
+                ifRemove(localArray, globalArray[index], subFolderName)
+              ]
+            );
+            console.log("downloaded file", globalArray[index]);
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          console.log("already exist", globalArray[index]);
+          localArray = removeItemOnce(
+            localArray,
+            localArray[ifRemove(localArray, globalArray[index], subFolderName)]
+          );
+        }
+      }
+
+      if (localArray.length > 0) {
+        console.log("there is something to delete in local", localArray);
+        for (
+          let localImageIndex = 0;
+          localImageIndex < localArray.length;
+          localImageIndex++
+        ) {
+          await FileSystem.deleteAsync(
+            `${FileSystem.documentDirectory}/tabs/${tabNameIndex}/${subFolderName}/${localArray[localImageIndex]}`,
+            { idempotent: true }
+          );
+        }
+      }
+    } else {
+      makeDirectory(`tabs/${tabNameIndex}/${subFolderName}`);
+    }
+  }
+
+  async function deleteFolders() {
     const folderPath = `${FileSystem.documentDirectory}/tabs`;
     try {
       await FileSystem.deleteAsync(folderPath, { idempotent: true });
@@ -138,10 +335,32 @@ export default function HomeScreen({ navigation }) {
       console.error("Error deleting folder:", error);
       showToast("error", `Failed to delete folder: ${error.message}`);
     }
+  }
+
+  async function syncData() {
+    setIsSyncing(true);
+
     showToast("success", "Syncing...", "Please do not close this screen");
     const storage = getStorage();
+
     console.log("_____________________________________________________");
     const tabNames = await getListOfFolders(BASEURL_TABS);
+    const tabNamesL = await listFolders(`tabs`);
+    // console.log("TAB NAMES G", tabNames);
+    // console.log("TAB NAMES L", tabNamesL);
+
+    for (
+      let localTabIndex = 0;
+      localTabIndex < tabNamesL.length;
+      localTabIndex++
+    ) {
+      if (!tabNames.includes(tabNamesL[localTabIndex])) {
+        await FileSystem.deleteAsync(
+          `${FileSystem.documentDirectory}/tabs/${tabNamesL[localTabIndex]}`,
+          { idempotent: true }
+        );
+      }
+    }
 
     for (let tabIndex = 0; tabIndex < tabNames.length; tabIndex++) {
       const imagesNames = await getFilesInSubfolder(
@@ -156,62 +375,77 @@ export default function HomeScreen({ navigation }) {
         `${BASEURL_TABS}/${tabNames[tabIndex]}/documents`
       );
 
-      if (imagesNames.length > 0) {
-        for (
-          let imageIndex = 0;
-          imageIndex < imagesNames.length;
-          imageIndex++
-        ) {
-          let imagePath = `tabs/${tabNames[tabIndex]}/images/${imagesNames[imageIndex]}`;
-          let imagePathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/images/${imagesNames[imageIndex]}`;
-          const fileRef = ref(storage, imagePathS);
-          const downloadUrl = await getDownloadURL(fileRef);
-          await downloadFile(imagePath, downloadUrl, fileRef);
-        }
-      } else {
-        makeDirectory(`tabs/${tabNames[tabIndex]}/images`);
-      }
-
-      if (videosNames.length > 0) {
-        for (
-          let videoIndex = 0;
-          videoIndex < videosNames.length;
-          videoIndex++
-        ) {
-          let videoPath = `tabs/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
-          let videoPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
-          const fileRef = ref(storage, videoPathS);
-          const downloadUrl = await getDownloadURL(fileRef);
-          await downloadFile(videoPath, downloadUrl, fileRef);
-        }
-      } else {
-        makeDirectory(`tabs/${tabNames[tabIndex]}/videos`);
-      }
-
-      if (documentsNames.length > 0) {
-        for (
-          let documentIndex = 0;
-          documentIndex < documentsNames.length;
-          documentIndex++
-        ) {
-          let documentPath = `tabs/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
-          let documentPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
-          const fileRef = ref(storage, documentPathS);
-          const downloadUrl = await getDownloadURL(fileRef);
-          await downloadFile(documentPath, downloadUrl, fileRef);
-        }
-      } else {
-        makeDirectory(`tabs/${tabNames[tabIndex]}/documents`);
-      }
-      const filesInTab = await getFilesInSubfolder(
-        `${BASEURL_TABS}/${tabNames[tabIndex]}`
+      let localImages = await listFiles(`tabs/${tabNames[tabIndex]}/images`);
+      // localImages = removeTextAfterLastDot(localImages);
+      let localVideos = await listFiles(`tabs/${tabNames[tabIndex]}/videos`);
+      let localDocuments = await listFiles(
+        `tabs/${tabNames[tabIndex]}/documents`
       );
-      console.log("filesInTab", filesInTab);
-      let iconPath = `tabs/${tabNames[tabIndex]}/icon`;
-      let iconPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/${filesInTab[0]}`;
-      const fileRef = ref(storage, iconPathS);
-      const downloadUrl = await getDownloadURL(fileRef);
-      await downloadFile(iconPath, downloadUrl, fileRef);
+      await matchAndDownload(
+        localImages,
+        imagesNames,
+        tabNames[tabIndex],
+        "images"
+      );
+      await matchAndDownload(
+        localVideos,
+        videosNames,
+        tabNames[tabIndex],
+        "videos"
+      );
+      await matchAndDownload(
+        localDocuments,
+        documentsNames,
+        tabNames[tabIndex],
+        "documents"
+      );
+
+      // if (videosNames.length > 0) {
+      //   for (
+      //     let videoIndex = 0;
+      //     videoIndex < videosNames.length;
+      //     videoIndex++
+      //   ) {
+      //     let videoPath = `tabs/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
+      //     let videoPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/videos/${videosNames[videoIndex]}`;
+      //     const fileRef = ref(storage, videoPathS);
+      //     const downloadUrl = await getDownloadURL(fileRef);
+      //     await downloadFile(videoPath, downloadUrl, fileRef);
+      //   }
+      // } else {
+      //   makeDirectory(`tabs/${tabNames[tabIndex]}/videos`);
+      // }
+
+      // if (documentsNames.length > 0) {
+      //   for (
+      //     let documentIndex = 0;
+      //     documentIndex < documentsNames.length;
+      //     documentIndex++
+      //   ) {
+      //     let documentPath = `tabs/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
+      //     let documentPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/documents/${documentsNames[documentIndex]}`;
+      //     const fileRef = ref(storage, documentPathS);
+      //     const downloadUrl = await getDownloadURL(fileRef);
+      //     await downloadFile(documentPath, downloadUrl, fileRef);
+      //   }
+      // } else {
+      //   makeDirectory(`tabs/${tabNames[tabIndex]}/documents`);
+      // }
+      const dirInfo = await FileSystem.getInfoAsync(
+        FileSystem.documentDirectory + `tabs/${tabNames[tabIndex]}/icon`
+      );
+      if (!dirInfo.exists) {
+        const filesInTab = await getFilesInSubfolder(
+          `${BASEURL_TABS}/${tabNames[tabIndex]}`
+        );
+        let iconPath = `tabs/${tabNames[tabIndex]}/icon`;
+        let iconPathS = `${BASEURL_TABS}/${tabNames[tabIndex]}/${filesInTab[0]}`;
+        const fileRef = ref(storage, iconPathS);
+        const downloadUrl = await getDownloadURL(fileRef);
+        await downloadFile(iconPath, downloadUrl, fileRef);
+      } else {
+        // console.log("Tab Icon exists", tabNames[tabIndex]);
+      }
     }
     setIsSyncing(false);
     getTabsL();
@@ -222,7 +456,7 @@ export default function HomeScreen({ navigation }) {
       const fullDirUri = FileSystem.documentDirectory + path;
       const items = await FileSystem.readDirectoryAsync(fullDirUri);
       const directories = [];
-      console.log("items", items);
+      // console.log("items", items);
       for (const item of items) {
         const itemUri = `${fullDirUri}/${item}`;
         const info = await FileSystem.getInfoAsync(itemUri);
@@ -231,7 +465,7 @@ export default function HomeScreen({ navigation }) {
         }
       }
 
-      console.log("Subdirectories:", directories);
+      // console.log("Subdirectories:", directories);
       return directories;
     } catch (error) {
       console.error("Error listing subdirectories:", error);
@@ -247,7 +481,7 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     getTabsL();
   }, []);
-  console.log("folders", folders);
+  // console.log("folders", folders);
   return (
     <View style={{ flex: 1, width: "100%", paddingHorizontal: 15 }}>
       <View
@@ -297,7 +531,7 @@ export default function HomeScreen({ navigation }) {
           )}
           numColumns={numColumns} // Use the state variable
           renderItem={({ item }) => {
-            console.log(`${FileSystem.documentDirectory}tabs/${item}/icon`);
+            // console.log(`${FileSystem.documentDirectory}tabs/${item}/icon`);
             return (
               <TouchableOpacity
                 style={{ flex: 1, margin: 0 }} // Adjust the margin as needed
@@ -320,7 +554,10 @@ export default function HomeScreen({ navigation }) {
                     borderColor: "rgba(0,0,0,0.1)",
                     margin: 1,
                     marginBottom: 2,
-                    width: "100%",
+                    width: isLandscape
+                      ? "100%"
+                      : Dimensions.get("window").width / numColumns - 6,
+                    // width: "100%",
                     // Optionally adjust the size more specifically for tablets here
                   }}
                   resizeMode="cover"
@@ -368,6 +605,21 @@ export default function HomeScreen({ navigation }) {
             syncData();
           }}
         />
+        {/* <Icon
+          name="delete"
+          size={40}
+          color={"white"}
+          style={{
+            marginHorizontal: 10,
+            padding: 2,
+            backgroundColor: theme.colors.brand.primary,
+            borderRadius: 50,
+            alignSelf: "center",
+          }}
+          onPress={() => {
+            deleteFolders();
+          }}
+        /> */}
       </View>
 
       <AddTabDialog

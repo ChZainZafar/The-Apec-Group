@@ -39,27 +39,35 @@ export default function FolderContentScreen({ route, navigation }) {
   const { usertype } = useContext(UserContext);
   const windowHeight = Dimensions.get("window").height;
   const windowWidth = Dimensions.get("window").width;
+
   const listFiles = async (path, callback) => {
-    try {
-      const fullDirUri = FileSystem.documentDirectory + path;
-      const items = await FileSystem.readDirectoryAsync(fullDirUri);
-      const files = [];
+    const dirInfo = await FileSystem.getInfoAsync(
+      FileSystem.documentDirectory + path
+    );
 
-      for (const item of items) {
-        console.log("item", item);
-        const itemUri = `${fullDirUri}/${item}`;
-        console.log(itemUri);
-        const info = await FileSystem.getInfoAsync(itemUri);
-        if (!info.isDirectory) {
-          files.push(item);
+    if (dirInfo.exists) {
+      try {
+        const fullDirUri = FileSystem.documentDirectory + path;
+        const items = await FileSystem.readDirectoryAsync(fullDirUri);
+        const files = [];
+
+        for (const item of items) {
+          // console.log("item", item);
+          const itemUri = `${fullDirUri}/${item}`;
+          const info = await FileSystem.getInfoAsync(itemUri);
+          if (!info.isDirectory) {
+            files.push(item);
+          }
         }
+        console.log("CONTENT SCREEN ___________");
+        console.log("FILES", files);
+        callback(files);
+        return files;
+      } catch (error) {
+        console.error("Error listing files:", error);
+        return [];
       }
-
-      // console.log("Files:", files);
-      callback(files);
-      return files;
-    } catch (error) {
-      console.error("Error listing files:", error);
+    } else {
       return [];
     }
   };
@@ -85,7 +93,7 @@ export default function FolderContentScreen({ route, navigation }) {
           type: "application/pdf",
         });
     } catch (e) {
-      console.log(e.message);
+      console.log("e.message", e.message);
     }
   }
   return (
@@ -163,21 +171,46 @@ export default function FolderContentScreen({ route, navigation }) {
         <FlatList
           data={videos}
           style={{ marginBottom: "2%" }}
-          numColumns={Math.floor(windowWidth / 150)}
+          numColumns={1}
           renderItem={({ item }) => {
-            // console.log("item", item);
-            return (
-              <VideoPlayer
-                videoProps={{
-                  shouldPlay: false,
-                  resizeMode: ResizeMode.CONTAIN,
+            console.log(
+              "Video uri: ",
+              `${FileSystem.documentDirectory}/tabs/${folder}/videos/${item}`
+            );
 
-                  source: {
-                    uri: `${FileSystem.documentDirectory}/tabs/${folder}/videos/${item}`,
-                  },
-                }}
-                style={{ flex: 1, aspectRatio: 1, margin: 1 }}
-              />
+            return (
+              // <VideoPlayer
+              //   videoProps={{
+              //     shouldPlay: false,
+              //     resizeMode: ResizeMode.CONTAIN,
+
+              //     source: {
+              //       uri: `${FileSystem.documentDirectory}/tabs/${folder}/videos/${item}`,
+              //     },
+              //   }}
+              //   style={{ flex: 1, aspectRatio: 1, margin: 1 }}
+              // />
+              <>
+                <TouchableOpacity
+                  style={{
+                    width: "100%",
+                    backgroundColor: "#e0e0e0",
+                    paddingVertical: 10,
+                    paddingHorizontal: 8,
+                    borderWidth: 2,
+                    borderColor: theme.colors.brand.primary,
+                    marginBottom: 10,
+                  }}
+                  onPress={() => {
+                    navigation.navigate("VideoPlayerScreen", {
+                      path: `${FileSystem.documentDirectory}/tabs/${folder}/videos/${item}`,
+                    });
+                  }}
+                >
+                  <Text syle={{ fontSize: 16 }}>{item}</Text>
+                </TouchableOpacity>
+                <Sepreator />
+              </>
             );
           }}
         />
@@ -351,6 +384,20 @@ export default function FolderContentScreen({ route, navigation }) {
         >
           <Text style={{ fontSize: theme.fontSizes.h5, fontWeight: "bold" }}>
             No videos found!
+          </Text>
+        </View>
+      )}
+      {checked == "Documents" && documents && (documents?.length ?? 0) == 0 && (
+        <View
+          style={{
+            position: "absolute",
+            top: "40%",
+            alignSelf: "center",
+            zIndex: -1,
+          }}
+        >
+          <Text style={{ fontSize: theme.fontSizes.h5, fontWeight: "bold" }}>
+            No documents found!
           </Text>
         </View>
       )}
