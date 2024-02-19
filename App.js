@@ -106,13 +106,13 @@ function App() {
           options={{ title: "Home" }}
         />
         {/* <Drawer.Screen name="PdfOpenerScreen" component={PdfOpenerScreen} /> */}
-        {usertype != "admin" && (
+        {/* {usertype != "admin" && (
           <Drawer.Screen
             name="ProfileScreen"
             component={ProfileScreen}
             options={{ title: "Profile" }}
           />
-        )}
+        )} */}
         <Drawer.Screen
           name="MessageScreen"
           component={MessageScreen}

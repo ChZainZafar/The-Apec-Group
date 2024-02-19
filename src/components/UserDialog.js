@@ -9,6 +9,7 @@ import { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext.js";
 export default function UserDialog({ user, visible, onDismiss }) {
   const [loading, setLoading] = useState(false);
+  console.log("user.email", user.email);
   async function ApproveUser() {
     try {
       setLoading(true);

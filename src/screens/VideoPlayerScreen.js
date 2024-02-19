@@ -1,21 +1,58 @@
-import { ResizeMode } from "expo-av";
+import React, { useState, useEffect } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import VideoPlayer from "expo-video-player";
-import * as FileSystem from "expo-file-system";
-import { Text } from "react-native";
+import * as ScreenOrientation from "expo-screen-orientation";
 
 export default function VideoPlayerScreen({ route }) {
   const { path } = route.params;
-  return (
-    <VideoPlayer
-      videoProps={{
-        shouldPlay: true,
-        resizeMode: ResizeMode.CONTAIN,
+  const [screenDimensions, setScreenDimensions] = useState(
+    Dimensions.get("window")
+  );
 
-        source: {
-          uri: path,
-        },
-      }}
-      //   fullscreen={{ visible: true }}
-    />
+  useEffect(() => {
+    const updateDimensions = () => {
+      setScreenDimensions(Dimensions.get("window"));
+    };
+
+    // Update dimensions when orientation changes
+    const subscription =
+      ScreenOrientation.addOrientationChangeListener(updateDimensions);
+
+    // Update dimensions when screen size changes (e.g., multi-window mode)
+    Dimensions.addEventListener("change", updateDimensions);
+
+    return () => {
+      ScreenOrientation.removeOrientationChangeListener(subscription);
+      Dimensions.removeEventListener("change", updateDimensions);
+    };
+  }, []);
+
+  const videoStyle = {
+    width: screenDimensions.width,
+    height: screenDimensions.height,
+  };
+
+  return (
+    <View style={styles.container}>
+      <VideoPlayer
+        style={videoStyle}
+        videoProps={{
+          shouldPlay: true,
+          resizeMode: "contain",
+          source: {
+            uri: path,
+          },
+        }}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  // You can remove videoLandscape if you're calculating dimensions dynamically
+});

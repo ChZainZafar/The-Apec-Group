@@ -24,19 +24,19 @@ export default function AddVideoDialog({ visible, onDismiss, folderId }) {
         allowsMultipleSelection: false,
       });
 
-      setTabVideo(result.assets[0].uri);
+      setTabVideo(result.assets[0]);
     } catch (e) {
       console.log(e);
     }
   };
   async function onAdd() {
     console.log("adding");
-    if (tabVideo) {
+    if (tabVideo && tabVideo.uri) {
       try {
         setLoading(true);
         const snapshot = await uploadImage(
-          `tabs/${folderId}/videos/${new Date().getMilliseconds()}`,
-          tabVideo
+          `tabs/${folderId}/videos/${tabVideo.fileName}`,
+          tabVideo.uri
         );
         console.log("video uploaded");
 
@@ -103,11 +103,11 @@ export default function AddVideoDialog({ visible, onDismiss, folderId }) {
           onPress={pickVideo}
           disabled={loading}
         >
-          {tabVideo ? (
+          {tabVideo && tabVideo.uri ? (
             <Video
               style={{ height: "90%", width: "100%", alignSelf: "center" }}
               source={{
-                uri: tabVideo,
+                uri: tabVideo.uri,
               }}
               useNativeControls
               resizeMode={ResizeMode.CONTAIN}

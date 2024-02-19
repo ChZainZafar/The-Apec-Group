@@ -207,7 +207,13 @@ export default function FolderContentScreen({ route, navigation }) {
                     });
                   }}
                 >
-                  <Text syle={{ fontSize: 16 }}>{item}</Text>
+                  <Text syle={{ fontSize: 16 }}>
+                    {item.endsWith(".mp4.mp4")
+                      ? item.slice(0, -8)
+                      : item.endsWith(".mp4")
+                      ? item.slice(0, -4)
+                      : item}
+                  </Text>
                 </TouchableOpacity>
                 <Sepreator />
               </>

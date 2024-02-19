@@ -26,8 +26,8 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
         quality: 0.2,
         allowsMultipleSelection: false,
       });
-
-      setTabImage(result.assets[0].uri);
+      console.log(result);
+      setTabImage(result.assets[0]);
     } catch (e) {
       console.log(e);
     }
@@ -35,12 +35,12 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
   // console.log(updatedFolder);
   async function onAdd() {
     console.log("adding");
-    if (tabImage) {
+    if (tabImage && tabImage.uri) {
       try {
         setLoading(true);
         const snapshot = await uploadImage(
-          `tabs/${folderId}/images/${new Date().getMilliseconds()}`,
-          tabImage
+          `tabs/${folderId}/images/${tabImage.fileName}`,
+          tabImage.uri
         );
         console.log("image uploaded");
         // const url = await getDownloadURL(snapshot.ref);
@@ -132,9 +132,9 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
               }}
             />
           )}
-          {tabImage ? (
+          {tabImage && tabImage.uri ? (
             <Image
-              source={{ uri: tabImage }}
+              source={{ uri: tabImage.uri }}
               style={{
                 height: "90%",
                 width: "100%",
