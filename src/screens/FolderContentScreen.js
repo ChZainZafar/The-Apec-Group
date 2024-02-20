@@ -96,6 +96,7 @@ export default function FolderContentScreen({ route, navigation }) {
       console.log("e.message", e.message);
     }
   }
+  const imageUris = [];
   return (
     <View style={{ width: "100%", height: "100%", paddingHorizontal: "8%" }}>
       <View
@@ -136,15 +137,17 @@ export default function FolderContentScreen({ route, navigation }) {
           data={images}
           style={{ marginBottom: "2%" }}
           numColumns={3}
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             // console.log("item: ", item);
             const uri = `${FileSystem.documentDirectory}/tabs/${folder}/images/${item}`;
+            imageUris.push(uri);
             return (
               <TouchableOpacity
                 onPress={() => {
                   navigation.navigate("FullScreen", {
-                    url: uri,
+                    uris: imageUris,
                     contentType: "image",
+                    index: index,
                   });
                 }}
                 style={{ flex: 1, aspectRatio: 1, margin: 1 }}

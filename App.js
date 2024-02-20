@@ -32,7 +32,7 @@ import { colors } from "./src/infrastructure/theme/colors.js";
 import MessageScreen from "./src/screens/MessageScreen.js";
 import * as Device from "expo-device";
 import * as ScreenOrientation from "expo-screen-orientation";
-
+import VideoPlayerScreen from "./src/screens/VideoPlayerScreen.js";
 async function changeScreenOrientation() {
   const isTablet = await Device.isTabletAsync();
   if (isTablet) {

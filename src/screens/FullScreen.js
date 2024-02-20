@@ -1,17 +1,16 @@
 import VideoPlayer from "expo-video-player";
 import { Image, View } from "react-native";
-
+import ImageViewer from "react-native-image-zoom-viewer";
 export default function FullScreen({ route }) {
-  const { url, contentType } = route.params;
-  console.log(url);
+  const { uris, contentType, index } = route.params;
+  console.log(uris);
   return (
     <>
       {contentType == "image" && (
         <View style={{ height: "100%", width: "100%" }}>
-          <Image
-            style={{ height: "100%", width: "100%" }}
-            resizeMode="contain"
-            source={{ uri: url }}
+          <ImageViewer
+            imageUrls={uris.map((img) => ({ url: img }))}
+            index={index}
           />
         </View>
       )}

@@ -530,6 +530,7 @@ export default function HomeScreen({ navigation }) {
             (a, b) => parseInt(a.split("_")[0]) - parseInt(b.split("_")[0])
           )}
           numColumns={numColumns} // Use the state variable
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => {
             // console.log(`${FileSystem.documentDirectory}tabs/${item}/icon`);
             return (
