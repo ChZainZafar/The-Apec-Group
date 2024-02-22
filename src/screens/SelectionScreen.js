@@ -9,7 +9,7 @@ export default function SelectionScreen({ navigation }) {
       <View style={{ flex: 0.35, width: "100%", backgroundColor: "white" }}>
         <Logo height={"100%"} width={"100%"} />
       </View>
-      {/* <Sepreator /> */}
+      <Sepreator />
       <View
         style={{
           flex: 0.65,

@@ -7,7 +7,7 @@
     "icon": "./assets/Logo.jpg",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/Logo.jpg",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -22,13 +22,13 @@
         "READ_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/Logo.jpg",
+        "foregroundImage": "./assets/adaptive-Logo.jpg",
         "backgroundColor": "#ffffff"
       },
       "package": "com.theapecgroup.apecgroup"
     },
     "web": {
-      "favicon": "./assets/Logo.jpg"
+      "favicon": "./assets/favLogo.jpg"
     },
     "plugins": [
       "expo-font",
