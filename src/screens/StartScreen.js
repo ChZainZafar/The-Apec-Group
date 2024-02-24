@@ -1,11 +1,9 @@
 import { Image, LogBox, TouchableOpacity } from "react-native";
-// Assuming the path to your GIF file is correct
-import Logo_animation from "../../assets/Logo_animation.gif"; // Update the path according to your project structure
 
 export default function StartScreen({ navigation, route }) {
   LogBox.ignoreLogs(["new NativeEventEmitter"]);
-  const { isStart } = route.params || {}; // Corrected typo and added a fallback to prevent errors
-
+  const { isStart } = route.params || {};
+  const logo_anomation = require("../../assets/Logo_animation.gif");
   return (
     <>
       {isStart ? (
@@ -19,7 +17,7 @@ export default function StartScreen({ navigation, route }) {
           }}
         >
           <Image
-            source={Logo_animation}
+            source={logo_anomation}
             style={{ height: "100%", width: "100%" }}
             resizeMode="contain"
           />
@@ -32,7 +30,7 @@ export default function StartScreen({ navigation, route }) {
           }}
         >
           <Image
-            source={Logo_animation}
+            source={logo_anomation}
             style={{ height: "100%", width: "100%" }}
             resizeMode="contain"
           />
