@@ -1,14 +1,43 @@
-// import React from "react";
-// import { WebView } from "react-native-webview";
+import React from "react";
+import { StyleSheet, Dimensions, View } from "react-native";
+import Pdf from "react-native-pdf";
 
-// // Your component or function that renders the PDF
-// export default function PdfOpenerScreen() {
-//   return (
-//     <WebView
-//       source={{
-//         uri: "https://firebasestorage.googleapis.com/v0/b/fir-db-project-798a3.appspot.com/o/tabs%2F1_1344136%2Fdocuments%2FCamScanner%2002-14-2024%2016.30.pdf?alt=media&token=a79d17f2-5259-4ace-b1fc-b6c9bbde51fd",
-//       }}
-//       style={{ flex: 1 }}
-//     />
-//   );
-// }
+const PDFExample = ({ route }) => {
+  const { uri } = route.params;
+  return (
+    <View style={styles.container}>
+      <Pdf
+        source={{
+          uri,
+        }}
+        onLoadComplete={(numberOfPages, filePath) => {
+          console.log(`Number of pages: ${numberOfPages}`);
+        }}
+        onPageChanged={(page, numberOfPages) => {
+          console.log(`Current page: ${page}`);
+        }}
+        onError={(error) => {
+          console.log(error);
+        }}
+        onPressLink={(uri) => {
+          console.log(`Link pressed: ${uri}`);
+        }}
+        style={styles.pdf}
+      />
+    </View>
+  );
+};
+export default PDFExample;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+  },
+  pdf: {
+    flex: 1,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+});

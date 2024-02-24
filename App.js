@@ -34,16 +34,18 @@ import * as Device from "expo-device";
 import * as ScreenOrientation from "expo-screen-orientation";
 import VideoPlayerScreen from "./src/screens/VideoPlayerScreen.js";
 async function changeScreenOrientation() {
-  const isTablet = await Device.isTabletAsync();
-  if (isTablet) {
-    await ScreenOrientation.lockAsync(
-      ScreenOrientation.OrientationLock.LANDSCAPE
-    );
-  } else {
-    await ScreenOrientation.lockAsync(
-      ScreenOrientation.OrientationLock.PORTRAIT
-    );
-  }
+  try {
+    const isTablet = await Device.isTabletAsync();
+    if (isTablet) {
+      await ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.LANDSCAPE
+      );
+    } else {
+      await ScreenOrientation.lockAsync(
+        ScreenOrientation.OrientationLock.PORTRAIT
+      );
+    }
+  } catch {}
 }
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -185,6 +187,7 @@ function App() {
             component={FolderContentScreen}
           />
           <Stack.Screen name="FullScreen" component={FullScreen} />
+          <Stack.Screen name="PdfOpenerScreen" component={PdfOpenerScreen} />
           <Stack.Screen
             name="VideoPlayerScreen"
             component={VideoPlayerScreen}

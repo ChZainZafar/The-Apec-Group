@@ -13,7 +13,6 @@ import {
 } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import { getDownloadURL } from "firebase/storage";
-import ImagePlaceholder from "../../assets/ImagePlaceholder.png";
 
 export default function AddImageDialog({ visible, onDismiss, folderId }) {
   const [tabImage, setTabImage] = useState(null);
@@ -144,7 +143,7 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
             />
           ) : (
             <Image
-              source={ImagePlaceholder}
+              source={require("../../assets/ImagePlaceholder.png")}
               style={{
                 height: "90%",
                 width: "100%",

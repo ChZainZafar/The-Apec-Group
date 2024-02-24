@@ -7,7 +7,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Platform,
 } from "react-native";
 import * as Sharing from "expo-sharing";
 import { useContext, useEffect, useState } from "react";
@@ -21,7 +20,6 @@ import { ResizeMode } from "expo-av";
 import Sepreator from "../components/Seperator";
 import { UserContext } from "../context/UserContext";
 import * as FileSystem from "expo-file-system";
-import * as IntentLauncher from "expo-intent-launcher";
 import { CheckBox } from "react-native-elements";
 import { getRadioButtonStyleProps } from "../utils/commonFunctions.js";
 export default function FolderContentScreen({ route, navigation }) {
@@ -84,14 +82,9 @@ export default function FolderContentScreen({ route, navigation }) {
   async function openPdf(uri) {
     try {
       const cUri = await FileSystem.getContentUriAsync(uri);
-      if (Platform.OS == "ios")
-        await Sharing.shareAsync(cUri, { UTI: "public.item" });
-      else
-        await IntentLauncher.startActivityAsync("android.intent.action.VIEW", {
-          data: cUri,
-          flags: 1,
-          type: "application/pdf",
-        });
+      navigation.navigate("PdfOpenerScreen", {
+        uri: cUri,
+      });
     } catch (e) {
       console.log("e.message", e.message);
     }

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "TheApecGroup",
+    "name": "Apec Group",
     "slug": "apecgroup",
     "version": "1.0.0",
     "orientation": "default",
@@ -11,24 +11,20 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.theapecgroup.apecgroup",
+      "buildNumber": "1"
     },
     "android": {
-      "permissions": [
-        "READ_EXTERNAL_STORAGE"
-      ],
+      "permissions": ["READ_EXTERNAL_STORAGE"],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-Logo.jpg",
+        "foregroundImage": "./assets/Logo.jpg",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.theapecgroup.apecgroup"
-    },
-    "web": {
-      "favicon": "./assets/favLogo.jpg"
+      "package": "com.theapecgroup.apecgroup",
+      "versionCode": 1
     },
     "plugins": [
       "expo-font",
@@ -37,19 +33,18 @@
         {
           "iCloudContainerEnvironment": "Production"
         }
-      ]
+      ],
+      "@config-plugins/react-native-blob-util",
+      "@config-plugins/react-native-pdf"
     ],
-    "extra": {
-      "eas": {
-        "projectId": "b996dae0-e207-4031-997c-0aa8a8713818"
-      }
-    },
     "owner": "theapecgroup",
     "runtimeVersion": {
       "policy": "appVersion"
     },
-    "updates": {
-      "url": "https://u.expo.dev/b996dae0-e207-4031-997c-0aa8a8713818"
+    "extra": {
+      "eas": {
+        "projectId": "ce42b110-1423-48c7-ba1a-0d2eb19fe61f"
+      }
     }
   }
 }

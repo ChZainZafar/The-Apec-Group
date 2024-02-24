@@ -14,7 +14,6 @@ import {
 } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import { getDownloadURL } from "firebase/storage";
-import ImagePlaceholder from "../../assets/ImagePlaceholder.png";
 export default function AddDocumentDialog({ visible, onDismiss, folderId }) {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -143,7 +142,7 @@ export default function AddDocumentDialog({ visible, onDismiss, folderId }) {
             </View>
           ) : (
             <Image
-              source={ImagePlaceholder}
+              source={require("../../assets/ImagePlaceholder.png")}
               style={{
                 height: "90%",
                 width: "100%",

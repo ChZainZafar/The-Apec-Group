@@ -13,7 +13,6 @@ import {
 } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import { getDownloadURL } from "firebase/storage";
-import ImagePlaceholder from "../../assets/ImagePlaceholder.png";
 import TextInput from "./TextInput.js";
 import Sepreator from "./Seperator.js";
 import { serverTimestamp } from "@firebase/firestore";
@@ -212,7 +211,7 @@ export default function AddMessageDialog({ visible, onDismiss, callback }) {
               />
             ) : (
               <Image
-                source={ImagePlaceholder}
+                source={require("../../assets/ImagePlaceholder.png")}
                 style={{
                   height: "53%",
                   width: "100%",
