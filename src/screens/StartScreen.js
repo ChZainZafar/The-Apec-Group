@@ -1,4 +1,4 @@
-import { LogBox, TouchableOpacity, View } from "react-native";
+import { LogBox, TouchableWithoutFeedback, View } from "react-native";
 import { Video, ResizeMode } from "expo-av";
 
 export default function StartScreen({ navigation, route }) {
@@ -13,7 +13,7 @@ export default function StartScreen({ navigation, route }) {
         }}
         source={require("../../assets/intro.mp4")}
         shouldPlay
-        useNativeControls
+        useNativeControls={false}
         resizeMode={ResizeMode.COVER}
         isLooping
       />
@@ -24,30 +24,24 @@ export default function StartScreen({ navigation, route }) {
       style={{
         flex: 1,
         backgroundColor: "white",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
-      {isStart ? (
-        <TouchableOpacity
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          onPress={() => {
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (isStart)
             navigation.navigate("SigninScreen", {
               usertype: "customer",
               isAdmin: false,
             });
-          }}
-        >
+          else navigation.navigate("HomeScreen");
+        }}
+      >
+        <View>
           <StartAnimation />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          onPress={() => {
-            navigation.navigate("HomeScreen");
-          }}
-        >
-          <StartAnimation />
-        </TouchableOpacity>
-      )}
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }

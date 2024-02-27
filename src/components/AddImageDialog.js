@@ -142,7 +142,7 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
             />
           ) : (
             <Image
-              source={Placeholder}
+              source={require("../../assets/Placeholder.png")}
               style={{
                 height: "90%",
                 width: "100%",

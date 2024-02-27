@@ -212,7 +212,7 @@ export default function AddMessageDialog({ visible, onDismiss, callback }) {
               />
             ) : (
               <Image
-                source={Placeholder}
+                source={require("../../assets/Placeholder.png")}
                 style={{
                   height: "53%",
                   width: "100%",

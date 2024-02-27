@@ -100,7 +100,7 @@ export default function AddTabDialog({ visible, onDismiss, setFolderId }) {
             />
           ) : (
             <Image
-              source={Placeholder}
+              source={require("../../assets/Placeholder.png")}
               style={{
                 height: "90%",
                 width: "100%",
