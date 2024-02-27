@@ -1,11 +1,31 @@
-import { Image, LogBox, TouchableOpacity } from "react-native";
+import { LogBox, TouchableOpacity, View } from "react-native";
+import { Video, ResizeMode } from "expo-av";
 
 export default function StartScreen({ navigation, route }) {
   LogBox.ignoreLogs(["new NativeEventEmitter"]);
   const { isStart } = route.params || {};
-  const logo_anomation = require("../../assets/Logo_animation.gif");
+  const StartAnimation = () => {
+    return (
+      <Video
+        style={{
+          height: 300,
+          width: 300,
+        }}
+        source={require("../../assets/intro.mp4")}
+        shouldPlay
+        useNativeControls
+        resizeMode={ResizeMode.COVER}
+        isLooping
+      />
+    );
+  };
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "white",
+      }}
+    >
       {isStart ? (
         <TouchableOpacity
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -16,11 +36,7 @@ export default function StartScreen({ navigation, route }) {
             });
           }}
         >
-          <Image
-            source={logo_anomation}
-            style={{ height: "100%", width: "100%" }}
-            resizeMode="contain"
-          />
+          <StartAnimation />
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -29,13 +45,9 @@ export default function StartScreen({ navigation, route }) {
             navigation.navigate("HomeScreen");
           }}
         >
-          <Image
-            source={logo_anomation}
-            style={{ height: "100%", width: "100%" }}
-            resizeMode="contain"
-          />
+          <StartAnimation />
         </TouchableOpacity>
       )}
-    </>
+    </View>
   );
 }
