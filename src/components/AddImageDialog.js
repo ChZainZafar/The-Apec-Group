@@ -1,7 +1,7 @@
 import { ActivityIndicator, Dialog } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { Image, TouchableOpacity, View } from "react-native";
+import { Image, Platform, TouchableOpacity, View } from "react-native";
 import { theme } from "../infrastructure/theme";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { showToast } from "../utils/commonFunctions";
@@ -11,9 +11,8 @@ import {
   updateDocument,
   uploadImage,
 } from "../config/firebase";
-import * as firestoreCollections from "../infrastructure/theme/firestore.js";
-import { getDownloadURL } from "firebase/storage";
 
+import Placeholder from "../../assets/Placeholder.png";
 export default function AddImageDialog({ visible, onDismiss, folderId }) {
   const [tabImage, setTabImage] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -143,7 +142,7 @@ export default function AddImageDialog({ visible, onDismiss, folderId }) {
             />
           ) : (
             <Image
-              source={require("../../assets/ImagePlaceholder.png")}
+              source={Placeholder}
               style={{
                 height: "90%",
                 width: "100%",

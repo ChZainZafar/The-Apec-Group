@@ -8,6 +8,8 @@ import { showToast } from "../utils/commonFunctions";
 import { addDocument, uploadImage } from "../config/firebase";
 import * as firestoreCollections from "../infrastructure/theme/firestore.js";
 import { getDownloadURL } from "firebase/storage";
+import Placeholder from "../../assets/Placeholder.png";
+
 import TextInput from "./TextInput.js";
 export default function AddTabDialog({ visible, onDismiss, setFolderId }) {
   const [tabImage, setTabImage] = useState(null);
@@ -98,7 +100,7 @@ export default function AddTabDialog({ visible, onDismiss, setFolderId }) {
             />
           ) : (
             <Image
-              source={require("../../assets/ImagePlaceholder.png")}
+              source={Placeholder}
               style={{
                 height: "90%",
                 width: "100%",
